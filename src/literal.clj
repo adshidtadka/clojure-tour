@@ -1,8 +1,11 @@
-(ns syntax)
+(ns literal)
 
 (defn -main []
   (println 42)
   (println -1.5)
+  (println 22/7)
+  (println ##Inf)
+  (println ##NaN)
   (println 22/7)
   (println "hello")
   (println \e)
