@@ -1,6 +1,7 @@
 (ns function-problem)
 
 (require '[clojure.repl :refer :all])
+(import '(java.net URL))
 
 ;; (defn greet [] (println "Hello"))
 ;; (def greet (fn [] (println "Hello")))
@@ -17,12 +18,25 @@
 
 (defn make-thingy [x] (fn [& _] (identity x)))
 
-(defn triplicate [f] (((f))))
+(defn triplicate [f] (f) (f) (f))
 
 (defn opposite [f]
   (fn [& args] (not (apply f args))))
 
-(defn http-get [url] (println (.openStream (.URL url))))
+(defn triplicate2 [f & args]
+  (triplicate (fn [] (apply f args))))
+
+(defn sincos [x]
+  (+ (Math/pow (Math/sin x) 2)
+     (Math/pow (Math/cos x) 2)))
+
+(defn http-get [url] (slurp (.openStream (URL. url))))
+
+(defn one-less-arg [f x]
+  (fn [& args] (apply f x args)))
+
+(defn two-fns [f g]
+  (fn [arg] (f (g arg))))
 
 (defn -main []
   (greet)
@@ -40,14 +54,25 @@
     (assert (= n (apply f 123 (range)))))
   (source constantly)
   (println)
-  (println (triplicate
-            (fn [] identity
-              (fn [] identity
-                (fn [] (identity "Hello"))))))
+  (println (triplicate greet))
   (println ((opposite (fn [x y] (and x y))) true false))
+  (println)
+  (println (triplicate2 greeting "Triplicate2"))
+  (println)
   (println (Math/cos Math/PI))
-  (println ((fn [x]
-              (+ (Math/pow (Math/sin x) 2)
-                 (Math/pow (Math/cos x) 2)))
-            Math/PI))
-  (http-get "https://www.w3.org"))
+  (println)
+  (println (sincos Math/PI))
+  (println (sincos 899))
+  (println)
+  (doc slurp)
+  (println)
+  (assert (.contains (http-get "https://www.w3.org") "html"))
+  (println)
+  (println ((one-less-arg  greeting "Good morning") "additional-arg"))
+  (println)
+  (doc partial)
+  (println)
+  (println ((partial  greeting "Good morning") "additional-arg"))
+  (println)
+  (println ((two-fns greeting greeting) "two-fns"))
+  (println))
